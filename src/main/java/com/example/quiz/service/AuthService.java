@@ -10,7 +10,9 @@ import org.springframework.stereotype.Service;
 
 import com.example.quiz.api.dto.auth.AuthResponse;
 import com.example.quiz.api.dto.auth.LoginRequest;
+import com.example.quiz.api.dto.auth.RefreshTokenRequest;
 import com.example.quiz.api.dto.auth.RegisterRequest;
+import com.example.quiz.api.dto.auth.TokenRefreshResponse;
 import com.example.quiz.exception.ApiException;
 import com.example.quiz.model.AppUser;
 import com.example.quiz.repository.AppUserRepository;
@@ -52,7 +54,8 @@ public class AuthService {
                 .build();
 
         String token = jwtService.generateToken(securityUser);
-        return new AuthResponse(token, "Bearer", saved.getId(), saved.getName(), saved.getEmail());
+        String refreshToken = jwtService.generateRefreshToken(securityUser);
+        return new AuthResponse(token, refreshToken, "Bearer", saved.getId(), saved.getName(), saved.getEmail());
     }
 
     public AuthResponse login(LoginRequest request) {
@@ -69,6 +72,26 @@ public class AuthService {
                 .build();
 
         String token = jwtService.generateToken(securityUser);
-        return new AuthResponse(token, "Bearer", appUser.getId(), appUser.getName(), appUser.getEmail());
+        String refreshToken = jwtService.generateRefreshToken(securityUser);
+        return new AuthResponse(token, refreshToken, "Bearer", appUser.getId(), appUser.getName(), appUser.getEmail());
+    }
+
+    public TokenRefreshResponse refreshToken(RefreshTokenRequest request, String email) {
+        AppUser appUser = appUserRepository.findByEmail(email)
+                .orElseThrow(() -> new ApiException(HttpStatus.UNAUTHORIZED, "User not found"));
+
+        UserDetails securityUser = User.withUsername(appUser.getEmail())
+                .password(appUser.getPassword())
+                .authorities(appUser.getRole())
+                .build();
+
+        // Validate refresh token
+        if (!jwtService.isTokenValid(request.refreshToken(), securityUser)) {
+            throw new ApiException(HttpStatus.UNAUTHORIZED, "Invalid or expired refresh token");
+        }
+
+        String newAccessToken = jwtService.generateToken(securityUser);
+        String newRefreshToken = jwtService.generateRefreshToken(securityUser);
+        return new TokenRefreshResponse(newAccessToken, newRefreshToken, "Bearer");
     }
 }
