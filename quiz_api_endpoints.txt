@@ -1,0 +1,17 @@
+ONLINE QUIZ SYSTEM - API ENDPOINTS
+
+  ------------------------
+  1. AUTHENTICATION
+  ------------------------
+
+POST /api/auth/student/register - Register a new student account
+
+POST /api/auth/admin/register - Register a new admin account
+
+POST /api/auth/student/login - Authenticate student and return access/refresh tokens
+
+POST /api/auth/admin/login - Authenticate admin and return access/refresh tokens
+
+  -------------
+  END OF FILE
+  -------------
