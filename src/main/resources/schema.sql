@@ -2,6 +2,7 @@ CREATE TABLE IF NOT EXISTS quizzes (
     id BIGINT PRIMARY KEY AUTO_INCREMENT,
     title VARCHAR(255) NOT NULL,
     description TEXT,
+    time_limit INT DEFAULT 30,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -35,8 +36,10 @@ CREATE TABLE IF NOT EXISTS submissions (
     id BIGINT PRIMARY KEY AUTO_INCREMENT,
     user_id BIGINT NOT NULL,
     quiz_id BIGINT NOT NULL,
+    start_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     score INT DEFAULT 0,
-    submitted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    submitted_at TIMESTAMP NULL,
+    status VARCHAR(20) NOT NULL DEFAULT 'IN_PROGRESS',
     CONSTRAINT uk_submission_user_quiz UNIQUE (user_id, quiz_id),
     CONSTRAINT fk_submission_user
         FOREIGN KEY (user_id) REFERENCES users(id),
