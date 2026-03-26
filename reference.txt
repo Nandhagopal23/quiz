@@ -1,0 +1,116 @@
+🧠 Core Design Idea
+
+We need to handle:
+
+Quiz → has multiple questions
+Question → has multiple options
+Submission → one per user per quiz
+Answers → user responses per question
+🗄️ Database Schema (SQL)
+1️⃣ Quiz Table
+CREATE TABLE Quiz (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    title VARCHAR(255),
+    description TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+2️⃣ Question Table
+CREATE TABLE Question (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    quiz_id INT,
+    text TEXT,
+    FOREIGN KEY (quiz_id) REFERENCES Quiz(id) ON DELETE CASCADE
+);
+3️⃣ Option Table
+CREATE TABLE Option (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    question_id INT,
+    text VARCHAR(255),
+    is_correct BOOLEAN DEFAULT FALSE,
+    FOREIGN KEY (question_id) REFERENCES Question(id) ON DELETE CASCADE
+);
+
+👉 Why separate table?
+
+Flexible (MCQ, multiple correct, etc.)
+Clean normalization
+4️⃣ User Table (Basic)
+CREATE TABLE User (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    name VARCHAR(100),
+    email VARCHAR(100) UNIQUE
+);
+5️⃣ Submission Table
+CREATE TABLE Submission (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    user_id INT,
+    quiz_id INT,
+    score INT DEFAULT 0,
+    submitted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+    UNIQUE(user_id, quiz_id), -- ✅ One submission per user
+
+    FOREIGN KEY (user_id) REFERENCES User(id),
+    FOREIGN KEY (quiz_id) REFERENCES Quiz(id)
+);
+
+✅ Enforces:
+
+One submission per user per quiz
+6️⃣ Answer Table (User Responses)
+CREATE TABLE Answer (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    submission_id INT,
+    question_id INT,
+    selected_option_id INT,
+
+    FOREIGN KEY (submission_id) REFERENCES Submission(id) ON DELETE CASCADE,
+    FOREIGN KEY (question_id) REFERENCES Question(id),
+    FOREIGN KEY (selected_option_id) REFERENCES Option(id)
+);
+⚙️ Backend Logic (VERY IMPORTANT for interview)
+✅ 1. Create Quiz
+Insert into Quiz
+Insert questions
+Insert options (mark correct ones)
+✅ 2. Submit Answers (Flow)
+Step 1: Check submission exists
+SELECT * FROM Submission 
+WHERE user_id = ? AND quiz_id = ?
+
+➡️ If exists → ❌ Reject (no reattempt)
+
+Step 2: Create submission
+INSERT INTO Submission(user_id, quiz_id) VALUES (?, ?);
+Step 3: Save answers
+
+Loop through user responses:
+
+INSERT INTO Answer(submission_id, question_id, selected_option_id)
+Step 4: Calculate score (SERVER SIDE 🔥)
+SELECT COUNT(*) 
+FROM Answer a
+JOIN Option o ON a.selected_option_id = o.id
+WHERE a.submission_id = ? AND o.is_correct = TRUE;
+Step 5: Update score
+UPDATE Submission SET score = ? WHERE id = ?;
+🔒 Constraints Covered
+Requirement	How it's handled
+One submission per user	UNIQUE(user_id, quiz_id)
+No modification after submission	Don’t allow UPDATE API
+Score calculated server-side	SQL join logic
+Prevent cheating	No correct answers sent to frontend
+💡 Bonus Improvements (for top-level answers)
+
+If interviewer asks “how to scale”:
+
+Add:
+time_limit in Quiz
+started_at in Submission
+Shuffle questions/options
+Cache quizzes (Redis)
+Add attempt_status (IN_PROGRESS, SUBMITTED)
+🧩 ER Diagram (Mental Model)
+User ───< Submission >─── Quiz ───< Question ───< Option
+                    |
+                    └──< Answer >── Option
