@@ -26,4 +26,10 @@ public class AppUser {
 
     @Column(nullable = false, unique = true, length = 100)
     private String email;
+
+    @Column(nullable = false)
+    private String password;
+
+    @Column(nullable = false, length = 30)
+    private String role = "ROLE_USER";
 }
