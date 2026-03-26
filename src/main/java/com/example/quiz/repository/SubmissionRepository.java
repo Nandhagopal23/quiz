@@ -10,5 +10,7 @@ public interface SubmissionRepository extends JpaRepository<Submission, Long> {
 
     Optional<Submission> findByUserIdAndQuizId(Long userId, Long quizId);
 
+    Optional<Submission> findByIdAndUserId(Long submissionId, Long userId);
+
     boolean existsByUserIdAndQuizId(Long userId, Long quizId);
 }

@@ -7,6 +7,8 @@ import java.util.List;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -45,19 +47,30 @@ public class Submission {
     @Column(nullable = false)
     private Integer score = 0;
 
-    @Column(name = "submitted_at", nullable = false, updatable = false)
+    @Column(name = "start_time", nullable = false, updatable = false)
+    private LocalDateTime startTime;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 20)
+    private SubmissionStatus status;
+
+    @Column(name = "submitted_at")
     private LocalDateTime submittedAt;
 
     @OneToMany(mappedBy = "submission", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Answer> answers = new ArrayList<>();
 
+    @SuppressWarnings("unused")
     @PrePersist
     void onCreate() {
-        if (submittedAt == null) {
-            submittedAt = LocalDateTime.now();
+        if (startTime == null) {
+            startTime = LocalDateTime.now();
         }
         if (score == null) {
             score = 0;
+        }
+        if (status == null) {
+            status = SubmissionStatus.IN_PROGRESS;
         }
     }
 }

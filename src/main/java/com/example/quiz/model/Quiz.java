@@ -34,16 +34,23 @@ public class Quiz {
     @Column(columnDefinition = "TEXT")
     private String description;
 
+    @Column(name = "time_limit")
+    private Integer timeLimit;
+
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
     @OneToMany(mappedBy = "quiz", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Question> questions = new ArrayList<>();
 
+    @SuppressWarnings("unused")
     @PrePersist
     void onCreate() {
         if (createdAt == null) {
             createdAt = LocalDateTime.now();
+        }
+        if (timeLimit == null) {
+            timeLimit = 30;
         }
     }
 }
