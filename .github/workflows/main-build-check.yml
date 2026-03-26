@@ -24,7 +24,7 @@ jobs:
         ports:
           - 3306:3306
         options: >-
-          --health-cmd="mysqladmin ping -h 127.0.0.1 -uroot -pNandha23"
+          --health-cmd="mysqladmin ping -h 127.0.0.1 -uroot -p252252"
           --health-interval=10s
           --health-timeout=5s
           --health-retries=10
@@ -63,12 +63,12 @@ jobs:
       mysql:
         image: mysql:8.0
         env:
-          MYSQL_ROOT_PASSWORD: Nandha23
+          MYSQL_ROOT_PASSWORD: 252252
           MYSQL_DATABASE: quiz_db
         ports:
           - 3306:3306
         options: >-
-          --health-cmd="mysqladmin ping -h 127.0.0.1 -uroot -pNandha23"
+          --health-cmd="mysqladmin ping -h 127.0.0.1 -uroot -p252252"
           --health-interval=10s
           --health-timeout=5s
           --health-retries=10
