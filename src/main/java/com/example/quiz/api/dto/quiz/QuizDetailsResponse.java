@@ -13,7 +13,13 @@ public record QuizDetailsResponse(
         @Schema(description = "Description of the quiz", example = "Basic Java programming concepts")
         String description,
         @Schema(description = "List of questions in the quiz")
-        List<QuizQuestionResponse> questions
+        List<QuizQuestionResponse> questions,
+        @Schema(description = "Start time of the quiz")
+        java.time.LocalDateTime startTime,
+        @Schema(description = "Time limit of the quiz in minutes")
+        Integer timeLimit,
+        @Schema(description = "Name of the creator")
+        String creatorName
         ) {
 
 }
