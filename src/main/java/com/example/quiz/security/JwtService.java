@@ -17,6 +17,10 @@ import io.jsonwebtoken.security.Keys;
 @Service
 public class JwtService {
 
+    private static final String TOKEN_TYPE_CLAIM = "type";
+    private static final String ACCESS_TOKEN_TYPE = "access";
+    private static final String REFRESH_TOKEN_TYPE = "refresh";
+
     private final JwtProperties jwtProperties;
 
     public JwtService(JwtProperties jwtProperties) {
@@ -31,6 +35,7 @@ public class JwtService {
                 .subject(userDetails.getUsername())
                 .issuedAt(now)
                 .expiration(expiry)
+                .claim(TOKEN_TYPE_CLAIM, ACCESS_TOKEN_TYPE)
                 .signWith(getSigningKey())
                 .compact();
     }
@@ -43,7 +48,7 @@ public class JwtService {
                 .subject(userDetails.getUsername())
                 .issuedAt(now)
                 .expiration(expiry)
-                .claim("type", "refresh")
+                .claim(TOKEN_TYPE_CLAIM, REFRESH_TOKEN_TYPE)
                 .signWith(getSigningKey())
                 .compact();
     }
@@ -54,7 +59,16 @@ public class JwtService {
 
     public boolean isTokenValid(String token, UserDetails userDetails) {
         final String username = extractUsername(token);
-        return username.equals(userDetails.getUsername()) && !isTokenExpired(token);
+        return username.equals(userDetails.getUsername())
+                && !isTokenExpired(token)
+                && isAccessToken(token);
+    }
+
+    public boolean isRefreshTokenValid(String token, UserDetails userDetails) {
+        final String username = extractUsername(token);
+        return username.equals(userDetails.getUsername())
+                && !isTokenExpired(token)
+                && isRefreshToken(token);
     }
 
     private boolean isTokenExpired(String token) {
@@ -76,6 +90,14 @@ public class JwtService {
                 .build()
                 .parseSignedClaims(token)
                 .getPayload();
+    }
+
+    private boolean isAccessToken(String token) {
+        return ACCESS_TOKEN_TYPE.equals(extractClaim(token, claims -> claims.get(TOKEN_TYPE_CLAIM, String.class)));
+    }
+
+    private boolean isRefreshToken(String token) {
+        return REFRESH_TOKEN_TYPE.equals(extractClaim(token, claims -> claims.get(TOKEN_TYPE_CLAIM, String.class)));
     }
 
     private Key getSigningKey() {
