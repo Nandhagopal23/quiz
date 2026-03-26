@@ -12,10 +12,12 @@ import com.example.quiz.api.dto.auth.LoginRequest;
 import com.example.quiz.api.dto.auth.RegisterRequest;
 import com.example.quiz.service.AuthService;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/auth")
+@Tag(name = "Authentication", description = "User registration, login, and token refresh endpoints")
 public class AuthController {
 
     private final AuthService authService;
