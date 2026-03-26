@@ -38,6 +38,12 @@ public class AuthController {
         return authService.registerAdmin(request);
     }
 
+    @PostMapping("/teacher/register")
+    @ResponseStatus(HttpStatus.CREATED)
+    public AuthResponse registerTeacher(@Valid @RequestBody RegisterRequest request) {
+        return authService.registerTeacher(request);
+    }
+
     @PostMapping("/student/login")
     public AuthResponse loginStudent(@Valid @RequestBody LoginRequest request) {
         return authService.loginStudent(request);
@@ -46,5 +52,10 @@ public class AuthController {
     @PostMapping("/admin/login")
     public AuthResponse loginAdmin(@Valid @RequestBody LoginRequest request) {
         return authService.loginAdmin(request);
+    }
+
+    @PostMapping("/teacher/login")
+    public AuthResponse loginTeacher(@Valid @RequestBody LoginRequest request) {
+        return authService.loginTeacher(request);
     }
 }

@@ -42,6 +42,10 @@ public class AuthService {
         return registerWithRole(request, "ROLE_ADMIN");
     }
 
+    public AuthResponse registerTeacher(RegisterRequest request) {
+        return registerWithRole(request, "ROLE_TEACHER");
+    }
+
     private AuthResponse registerWithRole(RegisterRequest request, String role) {
         if (appUserRepository.findByEmail(request.email()).isPresent()) {
             throw new ApiException(HttpStatus.CONFLICT, "Email is already registered");
@@ -70,6 +74,10 @@ public class AuthService {
 
     public AuthResponse loginAdmin(LoginRequest request) {
         return loginWithRole(request, "ROLE_ADMIN");
+    }
+
+    public AuthResponse loginTeacher(LoginRequest request) {
+        return loginWithRole(request, "ROLE_TEACHER");
     }
 
     private AuthResponse loginWithRole(LoginRequest request, String expectedRole) {
