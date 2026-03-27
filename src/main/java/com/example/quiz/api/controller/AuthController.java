@@ -47,4 +47,15 @@ public class AuthController {
     public AuthResponse loginAdmin(@Valid @RequestBody LoginRequest request) {
         return authService.loginAdmin(request);
     }
+
+    @PostMapping("/teacher/register")
+    @ResponseStatus(HttpStatus.CREATED)
+    public AuthResponse registerTeacher(@Valid @RequestBody RegisterRequest request) {
+        return authService.registerTeacher(request);
+    }
+
+    @PostMapping("/teacher/login")
+    public AuthResponse loginTeacher(@Valid @RequestBody LoginRequest request) {
+        return authService.loginTeacher(request);
+    }
 }
